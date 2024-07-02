@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- <link rel="stylesheet" href="style.css" type="text/css" /> -->
+    <style>
+      body {
+        position: relative;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "poppins", "Courier New", Courier, monospace;
+        z-index: 1;
+        overflow: hidden;
+      }
+
+      .container {
+        position: relative;
+        backdrop-filter: blur(13px) saturate(180%);
+        -webkit-backdrop-filter: blur(13px) saturate(180%);
+        border-radius: 12px;
+        border: 1px solid rgba(209, 213, 219, 0.3);
+        z-index: 1;
+        border-radius: 30px;
+        height: 30rem;
+        width: 25em;
+        background-color: rgba(255, 255, 255, 0.66);
+      }
+
+      .sub-container {
+        height: 50px;
+        margin: 10px;
+        padding: 10px;
+        border-radius: 30px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-evenly;
+      }
+
+      .inputUser {
+        border-radius: 6px;
+        border: none;
+        outline: none;
+        padding: 10px;
+        font-family: "Poppins", "Courier New", Courier, monospace;
+        border: 1px solid chartreuse;
+      }
+      .inputUser:focus {
+        border: 1px solid rgb(66, 66, 179);
+      }
+
+      .btn-class {
+        border-radius: 6px;
+        border: none;
+        outline: none;
+        padding: 5px;
+        width: 100px;
+        cursor: pointer;
+        font-family: "Poppins", "Courier New", Courier, monospace;
+      }
+      .btn-class:hover {
+        background: #000;
+        color: white;
+      }
+
+      .container-for-gambar {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .gambar {
+        width: 100px;
+        padding: 20px;
+      }
+
+      .figure {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+
+      .figure > figcaption {
+        text-align: center;
+        font-size: 25px;
+      }
+
+      .container-for-kelembapan-dan-angin {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .figure-untuk-kelembapan > figcaption {
+        text-align: center;
+        font-size: 20px;
+      }
+      .figure-untuk-angin > figcaption {
+        text-align: center;
+        font-size: 20px;
+      }
+
+      .gambar-kelembapan {
+        width: 50px;
+      }
+      .gambar-angin {
+        width: 50px;
+      }
+
+      .figure-untuk-angin,
+      .figure-untuk-kelembapan {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+
+      .temperature {
+        margin: 0;
+        font-size: 30px;
+      }
+
+      .weather {
+        display: none;
+      }
+
+      .error {
+        text-align: left;
+        margin-left: 10px;
+        padding: 5px;
+        font-size: 10px;
+        font-weight: 400;
+      }
+
+      .cloud {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 150px; /* Ukuran awan */
+        height: auto;
+        opacity: 0.8;
+        animation: moveClouds ease-in-out infinite;
+      }
+
+      .rainy {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 150px; /* Ukuran awan */
+        height: auto;
+        opacity: 0.8;
+        animation: moveClouds ease-in-out infinite;
+      }
+
+      @keyframes moveClouds {
+        from {
+          transform: translateX(100%);
+        }
+        to {
+          transform: translateX(-100%);
+        }
+      }
+      /* animation */
+    </style>
+    <title>Wheater App</title>
+  </head>
+  <body>
+    <section class="container">
+      <section class="sub-container">
+        <input
+          type="text"
+          class="inputUser"
+          placeholder="masukan nama kota..."
+        />
+        <button class="btn-class">search...</button>
+      </section>
+
+      <div class="error">
+        <h2>kota tidak ditemukan</h2>
+      </div>
+      <!-- gambar cuaca -->
+      <section class="weather">
+        <section class="container-for-gambar">
+          <figure class="figure">
+            <img src="./assets/cloudy.png" alt="cloudy" class="gambar" />
+            <h2 class="temperature"></h2>
+            <figcaption class="kota"></figcaption>
+          </figure>
+        </section>
+
+        <!-- kelembapan dan angin -->
+        <section class="container-for-kelembapan-dan-angin">
+          <!-- untuk kelembapan -->
+          <section class="humid">
+            <figure class="figure-untuk-kelembapan">
+              <img
+                src="./assets/humidity.png"
+                alt=""
+                class="gambar-kelembapan"
+              />
+              <figcaption class="figcaption-humid"></figcaption>
+            </figure>
+          </section>
+
+          <!-- untuk angin -->
+          <section class="wind">
+            <figure class="figure-untuk-angin">
+              <img src="./assets/wind-farm.png" alt="" class="gambar-angin" />
+              <figcaption class="figcaption-wind"></figcaption>
+            </figure>
+          </section>
+        </section>
+      </section>
+    </section>
+  </body>
+  <script>
+    const api = "b55dc9d94bf2b5fffb30f51fbb6aa955";
+    const apiPath = `https://api.openweathermap.org/data/2.5/weather?q=`;
+
+    const searchBox = document.querySelector(".sub-container input");
+    const buttonBox = document.querySelector(".sub-container button");
+    const Gambar = document.querySelector(".gambar");
+    const body = document.querySelector("body");
+
+    const jumlahAwan = 30;
+    const rainy = () => {
+      for (let i = 0; i < jumlahAwan; i++) {
+        const rainy = document.createElement("img");
+        rainy.src = "./assets/rainy-bg.png";
+        cloud.className = "rainy";
+        cloud.style.top = `${Math.random() * 100}%`;
+        cloud.style.left = `${Math.random() * 100}%`;
+        cloud.style.animationDuration = `${20 + Math.random() * 10}s`;
+        cloud.style.opacity = `${0.5 + Math.random() * 0.5}`;
+
+        body.appendChild(rainy);
+      }
+    };
+
+    const cuacaBerawan = () => {
+      for (let i = 0; i < jumlahAwan; i++) {
+        const cloud = document.createElement("img");
+        cloud.src = "./assets/clouds.png";
+        cloud.className = "cloud";
+
+        cloud.style.top = `${Math.random() * 100}%`;
+        cloud.style.left = `${Math.random() * 100}%`;
+        cloud.style.animationDuration = `${20 + Math.random() * 10}s`;
+        cloud.style.opacity = `${0.5 + Math.random() * 0.5}`;
+        body.appendChild(cloud);
+      }
+    };
+
+    const wheaterChecker = async (city) => {
+      const response = await fetch(apiPath + city + `&appid=${api}`);
+      let data = await response.json();
+
+      if (response.status == 404) {
+        document.querySelector(".weather").style.display = "none";
+        document.querySelector(".error").style.display = "block";
+        // document.querySelector(".error").style
+      } else {
+        document.querySelector(".kota").innerHTML = data.name;
+
+        document.querySelector(".figcaption-wind").innerHTML =
+          data.wind.speed + " " + "km / h";
+
+        document.querySelector(".figcaption-humid").innerHTML =
+          data.main.humidity;
+        document.querySelector(".temperature").innerHTML =
+          data.main.temp + " K";
+
+        if (data.weather[0].main === "Clouds") {
+          cuacaBerawan();
+          Gambar.src = "./assets/cloudy.png";
+        } else if (data.weather[0].main === "Clear") {
+          Gambar.src = "./assets/clearSky.png";
+        } else if (data.weather[0].main === "Rain") {
+          rainy();
+          Gambar.src = "./assets/rainy.png";
+        } else if (data.weather[0].main === "Mist") {
+          Gambar.src = "./assets/fog.png";
+        } else if (data.weather[0].main === "Drizzle") {
+          Gambar.src = "./assets/drizzle.png";
+        }
+        document.querySelector(".weather").style.display = "block";
+        document.querySelector(".error").style.display = "none";
+      }
+    };
+
+    buttonBox.addEventListener("click", () => {
+      wheaterChecker(searchBox.value);
+    });
+  </script>
+</html>
